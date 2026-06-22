@@ -1,0 +1,14 @@
+project Adallm is
+   for Source_Dirs use ("src");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+   for Main use ("adallm-cli.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use ("-gnatwa", "-gnatQ", "-gnat12");
+   end Compiler;
+
+   package Linker is
+      for Switches ("Ada") use Ads_Linker_Options;
+   end Linker;
+end Adallm;

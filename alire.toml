@@ -1,0 +1,15 @@
+name = "adallm"
+description = "Unified Ada client for 14+ LLM providers (OpenAI, Anthropic, Groq, ...)"
+version = "1.0.0"
+licenses = "Apache-2.0"
+tags = ["llm", "ai", "chat", "openai", "anthropic", "rest", "streaming"]
+
+authors = ["Baalateja Kataru (bkataru)"]
+maintainers = ["bkataru <baalateja.k@gmail.com>"]
+
+[[depends-on]]
+aws = "^27.0"
+json = "^6.0"
+
+[configuration]
+project-files = ["adallm.gpr"]
