@@ -10,6 +10,3 @@ maintainers = ["bkataru <baalateja.k@gmail.com>"]
 [[depends-on]]
 aws = "^27.0"
 json = "^6.0"
-
-[configuration]
-project-files = ["adallm.gpr"]

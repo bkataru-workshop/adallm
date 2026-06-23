@@ -1,5 +1,19 @@
-# Object file
+# Ada build artifacts
 *.o
-
-# Ada Library Information
 *.ali
+*.a
+*.so
+*.dll
+*.exe
+*.dSYM/
+
+# GNAT/GPR build outputs
+/obj/
+/bin/
+
+# Alire-generated local files
+/alire/*
+!/alire/alire.lock
+
+# Generated config files from Alire
+/config/

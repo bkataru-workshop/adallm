@@ -9,6 +9,6 @@ project Adallm is
    end Compiler;
 
    package Linker is
-      for Switches ("Ada") use Ads_Linker_Options;
+      for Switches ("Ada") use ("-g");
    end Linker;
 end Adallm;
