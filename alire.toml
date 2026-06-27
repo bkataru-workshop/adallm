@@ -10,3 +10,6 @@ maintainers = ["bkataru <baalateja.k@gmail.com>"]
 [[depends-on]]
 aws = "^27.0"
 json = "^6.0"
+
+[[depends-on]]
+ada_language_server = "^26.0.0"

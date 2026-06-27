@@ -71,7 +71,7 @@ package Adallm is
         Tool_Call_Id : Unbounded_String;
         Tool_Calls   : Tool_Call_Array (1 .. 0); -- populated dynamically
     end record;
-    type Message_Array is array (Positive range <>) of Message;
+    type Message_Array is array (Positive range <>) of Message__;
 
     type Tool_Def is record
         Typ             : Tool_Type;
@@ -105,7 +105,7 @@ package Adallm is
         Id              : Unbounded_String;
         Model           : Unbounded_String;
         Content         : Unbounded_String;
-        Finish          : Finish_Reason := Unknown;
+        Finish          : F.inish_Reason := Unknown;
         Usage_Info      : Usage;
         Stats_Info      : Stats;
         Error           : Error_Kind := OK;
@@ -153,7 +153,7 @@ package Adallm is
     function Create_Request return Request;
 
     procedure Set_Model (R : in out Request; Model : String);
-    procedure Add_Message (R : in out Request; Msg : Message);
+    procedure Add_Message (R : in out Request; Msg : Message__);
     procedure Set_System_Prompt (R : in out Request; Prompt : String);
     procedure Set_Max_Tokens (R : in out Request; N : Positive);
     procedure Set_Temperature (R : in out Request; T : Float);
@@ -202,10 +202,81 @@ package Adallm is
 
     -- Message constructors
 
-    function Make_User_Message (Content : String) return Message;
-    function Make_Assistant_Message (Content : String) return Message;
-    function Make_System_Message (Content : String) return Message;
+    function Make_User_Message (Content : String) return Message__;
+    function Make_Assistant_Message (Content : String) return Message__;
+    function Make_System_Message (Content : String) return Message__;
+    function Make_Tool_Result
+       (Tool_Call_Id, Content : String) return Message__;
+    function Make_Tool_Def
+       (Name, Desc, Params_Json : String) return Tool_Def__;
 
-    
+    procedure Print_Stats (Resp : Response__; Output : Ada.Text_IO.File_Type);
+
+private
+
+    use type AWS.Client.HTTP_Connection;
+
+    type Header_Pair is record
+        Key   : Unbounded_String;
+        Value : Unbounded_String;
+    end record;
+
+    type Header_List is array (Positive range <>) of Header_Pair;
+
+    type Client is tagged record
+        Provider            : Provider_Kind := OpenAI;
+        Api_Key             : Unbounded_String;
+        Base_URL            : Unbounded_String;
+        Model               : Unbounded_String;
+        Timeout_Seconds     : Positive := 30;
+        Max_Retries         : Natural := 3;
+        Retry_Delay_Ms      : Natural := 1000;
+        Retry_Delay_Max_Ms  : Natural := 30000;
+        Retry_Backoff_Mult  : Float := 2.0;
+        Retry_On_Rate_Limit : Boolean := True;
+        Verbosity           : Natural := 0;
+        Verify_SSL          : Boolean := True;
+        Proxy               : Unbounded_String;
+        Org_Id              : Unbounded_String;
+        Project_Id          : Unbounded_String;
+        Headers             : Header_List (1 .. 32);
+        Header_Count        : Natural := 0;
+    end record;
+
+    Max_Messages : constant := 256;
+    Max_Tools    : constant := 64;
+    Max_Stops    : constant := 16;
+
+    type Request is tagged record
+        Messages          : Message_Array (1 .. Max_Messages);
+        Message_Count     : Natural := 0;
+        Model             : Unbounded_String;
+        Max_Tokens        : Positive := 4096;
+        Temperature       : Float := 1.0;
+        Top_P             : Float := 1.0;
+        Top_K             : Natural := 0;
+        Frequency_Penalty : Float := 0.0;
+        Presence_Penalty  : Float := 0.0;
+        Stop_Seqs         : Unbounded_String (1 .. Max_Stops);
+        Stop_Count        : Natural := 0;
+        Stream            : Boolean := False;
+        Stream_CB         : Stream_Callback;
+        Stream_User_Data  : System.Address := System.Null_Address;
+        Tools             : Tool_Def_Array (1 .. Max_Tools);
+        Tools_Count       : Natural := 0;
+        Tool_Choice       : Unbounded_String;
+        System_Prompt     : Unbounded_String;
+        Json_Mode         : Boolean := False;
+        Seed              : Integer := 0;
+        Use_Seed          : Boolean := False;
+        User_Data         : System.Address := System.Null_Address;
+    end record;
+
+    type Response_Access_Array is array (Positive range <>) of Response_Access;
+
+    -- Helper: convert Unbounded_String to/from String
+    function "+" (S : String) return Unbounded_String
+    renames To_Unbounded_String;
+    function "+" (U : Unbounded_String) return String renames To_String;
 
 end Adallm;
